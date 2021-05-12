@@ -33,6 +33,7 @@ import java.util.zip.CheckedInputStream;
 import kilim.analysis.ClassInfo;
 import kilim.analysis.ClassWeaver;
 import kilim.mirrors.Detector;
+import kilim.mirrors.CachedClassMirrors;
 import kilim.mirrors.ClassMirrorNotFoundException;
 import kilim.mirrors.Mirrors;
 
@@ -138,7 +139,7 @@ public class Compiler implements Opcodes {
 		 * @param mirrors
 		 */
 		public ErjangDetector(String className, Set<String> nonPausableMethods) {
-			super(Detector.DEFAULT.mirrors);
+			super(new CachedClassMirrors());
 			this.className = className;
 			this.nonPausableMethods = nonPausableMethods;
 		}
