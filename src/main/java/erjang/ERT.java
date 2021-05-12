@@ -806,8 +806,8 @@ public class ERT {
 		throw new ErlangError(ETuple.make(am_try_case_clause, val));
 	}
 
-	static kilim.Scheduler scheduler = new kilim.Scheduler(threadPoolSize());
-	static kilim.Scheduler async_scheduler = new kilim.Scheduler(asyncThreadPoolSize());
+	static kilim.Scheduler scheduler = new kilim.AffineScheduler(threadPoolSize(), 0);
+	static kilim.Scheduler async_scheduler = new kilim.AffineScheduler(asyncThreadPoolSize(), 0);
 	public static EAtom am_io = EAtom.intern("io");
 	public static EAtom am_attributes = EAtom.intern("attributes");
 	public static EAtom am_compile = EAtom.intern("compile");
