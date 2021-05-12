@@ -428,7 +428,7 @@ public final class EProc extends ETask<EInternalPID> {
             ESeq links = links();
             return new ETuple2(am_links, links);
         } else if (spec == am_status) {
-            if (this.running) {
+            if (this.running.get()) {
                 return new ETuple2(am_status, am_running);
             } else if (this.pauseReason != null) {
                 return new ETuple2(am_status, am_waiting);
