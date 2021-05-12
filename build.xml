@@ -3,8 +3,9 @@
 	<property name="erjang.version" value="0.2" />
 	<property file="erjang_cfg.properties" />
 
-
+	<!-- TODO hackathon kludge -->
 	<property name="erjang.otp.root" location="/home/jesperes/dev/otp-install/23.2.4+kred1/" />
+	
 	<path id="erjang.classpath">
 		<pathelement location="target/classes/" />
 		<fileset dir="lib">
