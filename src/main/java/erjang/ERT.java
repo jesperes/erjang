@@ -918,8 +918,11 @@ public class ERT {
 				
 
 				if (ipclog.isLoggable(Level.FINE)) ipclog.fine("WAIT| "+proc+" waiting for "+left+"ms for msg #"+(proc.midx+1));
-				boolean res = proc.mbox
-					.untilHasMessages(proc.midx + 1, left);
+				// TODO hackathon workaround
+				// mbox.untilHasMessage(timeout) no longer exists, so what to do ???
+				/* boolean res = */ proc.mbox
+					.untilHasMessages(proc.midx + 1 /* , left */);
+				boolean res = true;
 				proc.check_exit();
 				if (ipclog.isLoggable(Level.FINE)) ipclog.fine("WAIT| "+proc+" wakes up "+(res?"on message" : "after timeout"));
 				

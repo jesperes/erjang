@@ -429,8 +429,11 @@ public abstract class ETask<H extends EHandle> extends kilim.Task {
 	/**
 	 * @param longValue
 	 */
-	public boolean mbox_wait(long timeoutMillis) throws Pausable {
-		return mbox.untilHasMessage(timeoutMillis);
+	public boolean mbox_wait(long _timeoutMillis) throws Pausable {
+		// TODO hackathon workaround
+		// mbox.untilHasMessage(timeout) no longer exists
+		mbox.untilHasMessage();
+		return true;
 	}
 
 	/**
