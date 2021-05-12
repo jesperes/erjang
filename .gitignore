@@ -17,3 +17,4 @@ test-outputs
 # Backup files:
 *~
 .#*
+/src/main/java/erjang/beam/interpreter/.gitignore
