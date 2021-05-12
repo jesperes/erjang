@@ -52,6 +52,7 @@
     <exec dir="src/main/java/erjang/beam/interpreter"
           executable="perl"
           input="src/main/java/erjang/beam/interpreter/ops.spec" failonerror="yes">
+      <arg value="-I."/>
       <arg value="-W"/>
       <arg value="ErjIG_Main.pl"/>
     </exec>
