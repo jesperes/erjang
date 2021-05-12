@@ -54,3 +54,30 @@ Remaining compilation errors seem to be related to changes in `kilim`.
 Kludges are marked with `// TODO hackathon`.
 
 ## Milestone 1: the crap actually compiles!
+
+But the "weaving" fails:
+
+```
+weave:
+     [echo] Weaving files ===================
+     [java] Exception in thread "main" java.lang.ExceptionInInitializerError
+     [java] 	at kilim.tools.Weaver.doMain(Weaver.java:99)
+     [java] 	at kilim.tools.Weaver.main(Weaver.java:80)
+     [java] Caused by: java.lang.IllegalArgumentException
+     [java] 	at org.objectweb.asm.ClassVisitor.<init>(Unknown Source)
+     [java] 	at org.objectweb.asm.ClassVisitor.<init>(Unknown Source)
+     [java] 	at kilim.mirrors.CachedClassMirrors$ClassMirror$Visitor.<init>(CachedClassMirrors.java:177)
+     [java] 	at kilim.mirrors.CachedClassMirrors$ClassMirror.<init>(CachedClassMirrors.java:112)
+     [java] 	at kilim.mirrors.CachedClassMirrors.mirror(CachedClassMirrors.java:55)
+     [java] 	at kilim.mirrors.CachedClassMirrors.classForName(CachedClassMirrors.java:49)
+     [java] 	at kilim.mirrors.CachedClassMirrors.mirror(CachedClassMirrors.java:81)
+     [java] 	at kilim.mirrors.Detector.<init>(Detector.java:35)
+     [java] 	at kilim.analysis.KilimContext.<init>(KilimContext.java:13)
+     [java] 	at kilim.analysis.KilimContext.<clinit>(KilimContext.java:8)
+     [java] 	... 2 more
+     [java] Java Result: 1
+```
+
+This is because the updated kilim needs an updated asm (to 7.1)
+
+## Milestone 2: "ant alljar" succeeds
