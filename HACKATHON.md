@@ -44,4 +44,13 @@ Dropping in the new kilim gives:
 This is presumably caused by the missing asm-all-4.1.jar. Try to download from
 https://repo1.maven.org/maven2/org/ow2/asm/asm-all/4.1/.
 
-... more compilation errors ensue ...
+## Task 2: fix compilation errors
+
+Remaining compilation errors seem to be related to changes in `kilim`.
+
+* ClassWeave constructor is different
+* Mailbox.untilHasMessages no longer has a timeout-variant
+
+Kludges are marked with `// TODO hackathon`.
+
+## Milestone 1: the crap actually compiles!
