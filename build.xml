@@ -11,6 +11,7 @@
     <pathelement location="lib/junit.jar" />
     <pathelement location="lib/clj-ds.jar" />
     <pathelement location="lib/antlr-3.2.jar" />
+  	<pathelement location="lib/asm-all-4.1.jar" />
     <pathelement path="${java.class.path}" />
   </path>
   <path id="erjang.testwovenclasspath">
@@ -21,9 +22,12 @@
     <pathelement location="lib/clj-ds.jar" />
     <pathelement location="lib/junit.jar" />
     <pathelement location="lib/antlr-3.2.jar" />
+  	<pathelement location="lib/asm-all-4.1.jar" />
     <pathelement path="${java.class.path}" />
   </path>
 
+  <property name="java-version" value="11"/>
+	
   <!-- set the operating system test properties -->
   <condition property="isMac">
     <os family="mac" />
@@ -86,14 +90,14 @@
 
   <target name="compile" depends="gen-interpreter,create-dirs">
     <echo message="Compiling src ===================" />
-    <javac includeantruntime="false" debug="true" srcdir="src/main/java" destdir="target/classes" classpathref="erjang.classpath" deprecation="off" debuglevel="lines,vars,source" target="1.7" source="1.7" fork="true">
+    <javac includeantruntime="false" debug="true" srcdir="src/main/java" destdir="target/classes" classpathref="erjang.classpath" deprecation="off" debuglevel="lines,vars,source" target="${java-version}" source="${java-version}" fork="true">
       <compilerarg value="-XDignore.symbol.file"/>
     </javac>
   </target>
 
   <target name="testcompile" depends="compile">
     <echo message="Compiling test ===================" />
-    <javac includeantruntime="false" debug="true" srcdir="src/test/java" destdir="target/test-classes" debuglevel="lines,vars,source" target="1.7" source="1.7">
+    <javac includeantruntime="false" debug="true" srcdir="src/test/java" destdir="target/test-classes" debuglevel="lines,vars,source" target="${java-version}" source="${java-version}">
       <classpath>
         <pathelement location="target/test-classes" />
       </classpath>
@@ -103,7 +107,7 @@
 
   <target name="gen-test-compile" depends="testcompile,gen-test-classes">
     <echo message="Compiling generated test classes ===================" />
-    <javac includeantruntime="false" debug="true" srcdir="src/test/java" destdir="target/test-classes" debuglevel="lines,vars,source" target="1.7" source="1.7">
+    <javac includeantruntime="false" debug="true" srcdir="src/test/java" destdir="target/test-classes" debuglevel="lines,vars,source" target="${java-version}" source="${java-version}">
       <classpath>
         <pathelement location="target/test-classes" />
       </classpath>
