@@ -228,9 +228,14 @@ public class BeamLoader extends CodeTables {
 		
 		for (int tag : SECTION_MD5_ORDER) {
 			smd = section_map.get(tag);
-			in.updateMessageDigest(context, smd.offset, smd.length);
+			if (smd == null) {
+				// TODO hackathon kludge
+				System.out.format("No tag %d in section map.%n", tag);
+			} else {
+				in.updateMessageDigest(context, smd.offset, smd.length);
+			}
 		}
-		
+
 		if ((smd = section_map.get(FUN_T)) != null) {
 			int start = smd.offset;
 			int left = smd.length;
