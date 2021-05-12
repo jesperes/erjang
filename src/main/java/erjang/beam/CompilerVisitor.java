@@ -22,6 +22,7 @@ import static erjang.beam.CodeAtoms.ERLANG_ATOM;
 import static erjang.beam.CodeAtoms.FALSE_ATOM;
 import static erjang.beam.CodeAtoms.TRUE_ATOM;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -36,11 +37,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
-
-import erjang.codegen.EFunCG;
-import kilim.Pausable;
-import kilim.analysis.ClassInfo;
-import kilim.analysis.ClassWeaver;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
@@ -93,7 +89,12 @@ import erjang.beam.Arg.Kind;
 import erjang.beam.ModuleAnalyzer.FunInfo;
 import erjang.beam.repr.ExtFun;
 import erjang.beam.repr.Insn;
+import erjang.codegen.EFunCG;
 import erjang.m.erlang.ErlConvert;
+import kilim.Pausable;
+import kilim.analysis.ClassInfo;
+import kilim.analysis.ClassWeaver;
+import kilim.analysis.KilimContext;
 
 /**
  * 
@@ -868,32 +869,39 @@ public class CompilerVisitor implements ModuleVisitor, Opcodes {
 						EOBJECT_TYPE, funInfo.may_return_tail_marker,
 						funInfo.is_pausable | funInfo.call_is_pausable);
 
-				ClassWeaver w = new ClassWeaver(data,
-						new Compiler.ErjangDetector(
-								self_type.getInternalName(),
-								non_pausable_methods));
-				w.weave();
-				if (w.getClassInfos().size() == 0) { // Class did not need
-														// weaving
-					try {
-						classRepo.store(full_inner_name, data);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				} else {
-					for (ClassInfo ci : w.getClassInfos()) {
+				
+				KilimContext context = new KilimContext();
+				context.detector = new Compiler.ErjangDetector(
+						self_type.getInternalName(),
+						non_pausable_methods);		
+				ByteArrayInputStream is = new ByteArrayInputStream(data);
+
+				try {
+					ClassWeaver w = new ClassWeaver(context, is);
+					w.weave();
+					if (w.getClassInfos().size() == 0) { // Class did not need
+															// weaving
 						try {
-							// System.out.println("> storing "+ci.className);
-							String iname = ci.className.replace('.', '/');
-							classRepo.store(iname, ci.bytes);
+							classRepo.store(full_inner_name, data);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
+					} else {
+						for (ClassInfo ci : w.getClassInfos()) {
+							try {
+								// System.out.println("> storing "+ci.className);
+								String iname = ci.className.replace('.', '/');
+								classRepo.store(iname, ci.bytes);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
 					}
+				} catch (IOException e) {
+					// TODO hackathon kludge
+					throw new RuntimeException(e);
 				}
-
 			}
-
 		}
 
 		private void ensure_exception_handler_in_place() {

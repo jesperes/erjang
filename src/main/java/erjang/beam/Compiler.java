@@ -18,8 +18,7 @@
 
 package erjang.beam;
 
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,28 +29,23 @@ import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
-import kilim.analysis.ClassInfo;
-import kilim.analysis.ClassWeaver;
-import kilim.mirrors.Detector;
-import kilim.mirrors.CachedClassMirrors;
-import kilim.mirrors.ClassMirrorNotFoundException;
-import kilim.mirrors.Mirrors;
-
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.util.CheckClassAdapter;
 
 import com.ericsson.otp.erlang.OtpAuthException;
 
 import erjang.EBinary;
 import erjang.EFun;
 import erjang.EObject;
-import erjang.ERT;
-import erjang.ETuple;
-import erjang.beam.analysis.BeamTypeAnalysis;
 import erjang.ErjangCodeCache;
-
+import erjang.beam.analysis.BeamTypeAnalysis;
 import erjang.beam.loader.ErjangBeamDisLoader;
+import kilim.analysis.ClassInfo;
+import kilim.analysis.ClassWeaver;
+import kilim.analysis.KilimContext;
+import kilim.mirrors.CachedClassMirrors;
+import kilim.mirrors.ClassMirrorNotFoundException;
+import kilim.mirrors.Detector;
 
 public class Compiler implements Opcodes {
 	private ClassRepo classRepo;
@@ -101,8 +95,13 @@ public class Compiler implements Opcodes {
 		repo.store("raw/"+cv.getInternalClassName(), byteArray);
 
 		boolean written = false;
-		ClassWeaver cwe = new ClassWeaver(byteArray, new ErjangDetector(
-				cv.getInternalClassName(), cv.non_pausable_methods));
+		
+		KilimContext context = new KilimContext();
+		context.detector = new ErjangDetector(
+				cv.getInternalClassName(), cv.non_pausable_methods);		
+		ByteArrayInputStream is = new ByteArrayInputStream(byteArray);
+		
+		ClassWeaver cwe = new ClassWeaver(context, is);
 		cwe.weave();
 		for (ClassInfo ci : cwe.getClassInfos()) {
 			String name = ci.className;

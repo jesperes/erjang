@@ -1,5 +1,44 @@
 package erjang.codegen;
 
+import static org.objectweb.asm.Opcodes.AASTORE;
+import static org.objectweb.asm.Opcodes.ACC_FINAL;
+import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
+import static org.objectweb.asm.Opcodes.ACC_PROTECTED;
+import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
+import static org.objectweb.asm.Opcodes.ACONST_NULL;
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.ANEWARRAY;
+import static org.objectweb.asm.Opcodes.ARETURN;
+import static org.objectweb.asm.Opcodes.ASTORE;
+import static org.objectweb.asm.Opcodes.DUP;
+import static org.objectweb.asm.Opcodes.GETFIELD;
+import static org.objectweb.asm.Opcodes.GETSTATIC;
+import static org.objectweb.asm.Opcodes.GOTO;
+import static org.objectweb.asm.Opcodes.IFNONNULL;
+import static org.objectweb.asm.Opcodes.IF_ACMPNE;
+import static org.objectweb.asm.Opcodes.INSTANCEOF;
+import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
+import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
+import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.PUTFIELD;
+import static org.objectweb.asm.Opcodes.RETURN;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+
 import erjang.BIF;
 import erjang.EAtom;
 import erjang.EFun;
@@ -13,22 +52,7 @@ import erjang.beam.EUtil;
 import kilim.Pausable;
 import kilim.analysis.ClassInfo;
 import kilim.analysis.ClassWeaver;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import static org.objectweb.asm.Opcodes.*;
+import kilim.analysis.KilimContext;
 
 public class EFunCG {
 
@@ -644,14 +668,22 @@ public class EFunCG {
     }
 
     public static byte[] weave(byte[] data) {
-        ClassWeaver w = new ClassWeaver(data, new erjang.beam.Compiler.ErjangDetector("/xx/", (Set<String>) Collections.EMPTY_SET));
-        w.weave();
-        for (ClassInfo ci : w.getClassInfos()) {
-            // ETuple.dump(ci.className, ci.bytes);
-
-            if (!ci.className.startsWith("kilim"))
-                data = ci.bytes;
-        }
+    	KilimContext context = new KilimContext();
+    	context.detector = new erjang.beam.Compiler.ErjangDetector("/xx/", Collections.emptySet());
+    	
+		try {
+			ClassWeaver w = new ClassWeaver(context, new ByteArrayInputStream(data));
+			w.weave();
+			for (ClassInfo ci : w.getClassInfos()) {
+				// ETuple.dump(ci.className, ci.bytes);
+				
+				if (!ci.className.startsWith("kilim"))
+					data = ci.bytes;
+			}
+		} catch (IOException e) {
+			// TODO hackathon kludge
+			throw new RuntimeException(e);
+		}
         return data;
     }
     /*^^^^^^^^^^^^^^^^^^^^ Code generation utilities:  ^^^^^^^^^^^^^^^^^^*/
